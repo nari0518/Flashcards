@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import readmeText from '../README.md?raw';
 
 const App = () => {
     // Default initial set structure
@@ -326,6 +327,9 @@ const App = () => {
             <header className="main-header">
                 <h1>漢字フラッシュカード</h1>
                 <p>自作の問題セットで効率的に学習</p>
+                <div style={{ marginTop: '1rem' }}>
+                    <button className="btn btn-text" onClick={() => setView('help')} style={{ fontSize: '1.2rem', textDecoration: 'underline' }}>📚 使い方はこちら</button>
+                </div>
             </header>
             <div className="glass card">
                 <div className="form-group">
@@ -540,9 +544,42 @@ const App = () => {
                             <span className="history-set">{record.setName}</span>
                             <span className="history-score">{record.correct} / {record.total}</span>
                         </div>
+                        {record.mistakes && record.mistakes.length > 0 && (
+                            <div className="history-mistakes" style={{ marginTop: '1rem', borderTop: '1px solid var(--glass-border)', paddingTop: '1rem' }}>
+                                <details>
+                                    <summary style={{ cursor: 'pointer', fontWeight: 'bold', color: 'var(--accent)' }}>間違えた問題を表示 ({record.mistakes.length}問)</summary>
+                                    <div className="mistakes-list history-mistakes-list" style={{ marginTop: '1rem' }}>
+                                        {record.mistakes.map((m, i) => (
+                                            <div key={i} className="mistake-item" style={{ padding: '1rem', marginBottom: '0.8rem' }}>
+                                                <div className="mistake-sentence" style={{ fontSize: '1rem' }}>{m.sentence}</div>
+                                                <div className="mistake-answer" style={{ fontSize: '1rem', marginTop: '0.5rem' }}>
+                                                    あなたの回答: <span style={{ color: 'var(--danger)', borderBottom: 'none', marginRight: '1rem' }}>{m.userAnswer || 'なし'}</span>
+                                                    正解: <span>{record.mode.includes('書き') ? m.kanji : m.reading}</span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </details>
+                            </div>
+                        )}
                     </div>
                 ))}
             </div>
+        </div>
+    );
+
+    const renderHelp = () => (
+        <div className="fade-in container-wide">
+            <header className="view-header">
+                <h2>使い方・機能説明</h2>
+                <button className="btn btn-outline" onClick={() => setView('setup')}>トップへ戻る</button>
+            </header>
+            <div className="glass card readme-content">
+                <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit', fontSize: '1.05rem', lineHeight: '1.8' }}>
+                    {readmeText}
+                </pre>
+            </div>
+            <button className="btn btn-primary btn-large" style={{ width: '100%', marginTop: '1rem' }} onClick={() => setView('setup')}>トップへ戻る</button>
         </div>
     );
 
@@ -554,6 +591,7 @@ const App = () => {
             {view === 'manage' && renderManage()}
             {view === 'history' && renderHistory()}
             {view === 'set-list' && renderSetList()}
+            {view === 'help' && renderHelp()}
             {renderModal()}
         </div>
     );
