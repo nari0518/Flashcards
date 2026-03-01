@@ -5,4 +5,3 @@ dist
 .env
 .vercel
 .vscode
-package-lock.json
