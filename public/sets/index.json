@@ -1,9 +1,14 @@
 {
-    "sets": [
-        {
-            "id": "sample-kanji",
-            "name": "サンプル漢字",
-            "filename": "sample.csv"
-        }
-    ]
+  "sets": [
+    {
+      "id": "static-set-Ujfnj77lm7",
+      "name": "R7現国学年末",
+      "filename": "R7現国学年末.csv"
+    },
+    {
+      "id": "static-set-c2FtcGxl",
+      "name": "sample",
+      "filename": "sample.csv"
+    }
+  ]
 }
