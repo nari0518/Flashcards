@@ -4,5 +4,5 @@ import react from '@vitejs/plugin-react'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: './', // GitHub Pagesなどのサブディレクトリデプロイに対応し、相対パスでアセットを読み込む
+  base: './', // GitHub Pagesなどのサブディレクトリデプロイに対応
 })
