@@ -1,14 +1,28 @@
 {
   "sets": [
     {
-      "id": "static-set-Ujfnj77lm7",
+      "id": "static-set-kanji-Ujfnj77lm7",
       "name": "R7現国学年末",
-      "filename": "R7現国学年末.csv"
+      "filename": "Kanji/R7現国学年末.csv",
+      "type": "Kanji"
     },
     {
-      "id": "static-set-c2FtcGxl",
+      "id": "static-set-kanji-c2FtcGxl",
       "name": "sample",
-      "filename": "sample.csv"
+      "filename": "Kanji/sample.csv",
+      "type": "Kanji"
+    },
+    {
+      "id": "static-set-english-Ujfoi7Hjgr",
+      "name": "R7英コミb",
+      "filename": "English/R7英コミb.csv",
+      "type": "English"
+    },
+    {
+      "id": "static-set-english-c2FtcGxlX2",
+      "name": "sample_en",
+      "filename": "English/sample_en.csv",
+      "type": "English"
     }
   ]
 }

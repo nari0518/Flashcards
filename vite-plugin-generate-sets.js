@@ -10,38 +10,54 @@ export default function generateSetsPlugin() {
 
             try {
                 if (fs.existsSync(setsDir)) {
-                    const files = fs.readdirSync(setsDir);
-                    const csvFiles = files.filter(f => f.endsWith('.csv'));
+                    const subDirs = ['Kanji', 'English'];
+                    let allSets = [];
 
-                    const sets = csvFiles.map(file => {
-                        const name = file.replace('.csv', '');
-                        // Generate a consistent ID based on the filename
-                        const id = `static-set-${Buffer.from(name).toString('base64').substring(0, 10)}`;
-                        return { id, name, filename: file };
+                    subDirs.forEach(type => {
+                        const dirPath = path.join(setsDir, type);
+                        if (fs.existsSync(dirPath)) {
+                            const files = fs.readdirSync(dirPath);
+                            const csvFiles = files.filter(f => f.endsWith('.csv'));
+
+                            const sets = csvFiles.map(file => {
+                                const name = file.replace('.csv', '');
+                                const id = `static-set-${type.toLowerCase()}-${Buffer.from(name).toString('base64').substring(0, 10)}`;
+                                return { id, name, filename: `${type}/${file}`, type: type };
+                            });
+                            allSets = [...allSets, ...sets];
+                        }
                     });
 
-                    const manifest = { sets };
-                    fs.writeJsonSync(manifestPath, manifest, { spaces: 2 });
-                    console.log(`[generate-sets-manifest] Created index.json with ${sets.length} sets from public/sets/`);
+                    fs.writeJsonSync(manifestPath, { sets: allSets }, { spaces: 2 });
+                    console.log(`[generate-sets-manifest] Created index.json with ${allSets.length} sets from public/sets/`);
                 }
             } catch (error) {
                 console.error('[generate-sets-manifest] Error generating index.json:', error);
             }
         },
-        // Also regenerate when a CSV is added/removed in dev mode
         handleHotUpdate({ file, server }) {
             if (file.includes('public/sets') && file.endsWith('.csv')) {
                 const setsDir = path.resolve(process.cwd(), 'public/sets');
                 const manifestPath = path.resolve(setsDir, 'index.json');
-                const files = fs.readdirSync(setsDir);
-                const csvFiles = files.filter(f => f.endsWith('.csv'));
 
-                const sets = csvFiles.map(f => {
-                    const name = f.replace('.csv', '');
-                    const id = `static-set-${Buffer.from(name).toString('base64').substring(0, 10)}`;
-                    return { id, name, filename: f };
+                const subDirs = ['Kanji', 'English'];
+                let allSets = [];
+
+                subDirs.forEach(type => {
+                    const dirPath = path.join(setsDir, type);
+                    if (fs.existsSync(dirPath)) {
+                        const files = fs.readdirSync(dirPath);
+                        const csvFiles = files.filter(f => f.endsWith('.csv'));
+
+                        const sets = csvFiles.map(f => {
+                            const name = f.replace('.csv', '');
+                            const id = `static-set-${type.toLowerCase()}-${Buffer.from(name).toString('base64').substring(0, 10)}`;
+                            return { id, name, filename: `${type}/${f}`, type: type };
+                        });
+                        allSets = [...allSets, ...sets];
+                    }
                 });
-                fs.writeJsonSync(manifestPath, { sets }, { spaces: 2 });
+                fs.writeJsonSync(manifestPath, { sets: allSets }, { spaces: 2 });
                 console.log(`[generate-sets-manifest] Updated index.json`);
             }
         }
