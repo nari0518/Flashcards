@@ -195,13 +195,14 @@ body {
 }
 
 .quiz-word-display {
-  font-size: clamp(2.5rem, 8vw, 4rem);
+  font-size: clamp(2rem, 6vw, 3.5rem);
   font-weight: 900;
   color: #fff;
   letter-spacing: -0.02em;
   word-wrap: break-word;
   word-break: break-word;
   overflow-wrap: break-word;
+  padding: clamp(0.5rem, 2vw, 1rem) 0;
 }
 
 /* Setup View */
@@ -311,17 +312,18 @@ body {
 
 .flashcard {
   background: linear-gradient(145deg, #1f2937, #111827);
-  padding: clamp(1.5rem, 5vw, 3rem) clamp(1rem, 4vw, 2rem);
+  padding: clamp(1rem, 3vw, 2.5rem) clamp(0.8rem, 3vw, 2rem);
   border-radius: 2.5rem;
   border: 2px solid var(--glass-border);
   text-align: center;
   margin-bottom: 2.5rem;
-  min-height: clamp(300px, 50vh, 500px);
-  max-height: 80vh;
+  min-height: auto;
+  max-height: 70vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: clamp(1rem, 3vw, 2rem);
+  align-items: center;
+  gap: clamp(0.8rem, 2vw, 1.5rem);
   position: relative;
   box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.6);
   overflow-y: auto;
@@ -331,13 +333,14 @@ body {
 }
 
 .sentence-text {
-  font-size: clamp(1.4rem, 5vw, 2.2rem);
+  font-size: clamp(1.2rem, 4vw, 1.8rem);
   font-weight: 700;
-  line-height: 1.8;
+  line-height: 1.6;
   word-wrap: break-word;
   word-break: break-word;
   overflow-wrap: break-word;
   hyphens: auto;
+  padding: clamp(0.5rem, 2vw, 1rem) 0;
 }
 
 .target-word {
@@ -364,12 +367,12 @@ body {
   background: #000;
   border: 3px solid var(--glass-border);
   border-radius: 1.2rem;
-  padding: clamp(0.75rem, 2vw, 1.5rem);
+  padding: clamp(0.6rem, 1.5vw, 1.2rem);
   color: #fff;
-  font-size: clamp(1.2rem, 4vw, 1.8rem);
+  font-size: clamp(1rem, 3.5vw, 1.5rem);
   font-weight: 800;
   text-align: center;
-  min-width: 0;
+  min-width: 100px;
   word-wrap: break-word;
   overflow-wrap: break-word;
 }
@@ -381,20 +384,21 @@ body {
 }
 
 .btn-answer {
-  padding: clamp(1rem, 2.5vw, 1.5rem) clamp(2rem, 5vw, 4rem);
-  font-size: clamp(1.1rem, 3vw, 1.4rem);
+  padding: clamp(0.8rem, 2vw, 1.2rem) clamp(1.5rem, 4vw, 3rem);
+  font-size: clamp(1rem, 3vw, 1.3rem);
   font-weight: 800;
   margin: 0 auto;
   box-shadow: 0 10px 25px rgba(168, 81, 247, 0.4);
 }
 
 .revealed-text {
-  font-size: clamp(3rem, 10vw, 6rem);
+  font-size: clamp(2.5rem, 8vw, 5rem);
   font-weight: 900;
   color: var(--accent);
   word-wrap: break-word;
   overflow-wrap: break-word;
   hyphens: auto;
+  padding: clamp(0.5rem, 2vw, 1rem) 0;
 }
 
 .answer-reveal {
@@ -414,18 +418,18 @@ body {
 
 .btn-correct {
   background: var(--success);
-  padding: clamp(0.8rem, 2vw, 1.2rem) clamp(1.5rem, 4vw, 3rem);
-  font-size: clamp(1.1rem, 3vw, 1.3rem);
+  padding: clamp(0.7rem, 1.5vw, 1rem) clamp(1.2rem, 3vw, 2.5rem);
+  font-size: clamp(0.95rem, 2.5vw, 1.2rem);
   flex: 1;
-  min-width: 120px;
+  min-width: 100px;
 }
 
 .btn-incorrect {
   background: var(--danger);
-  padding: clamp(0.8rem, 2vw, 1.2rem) clamp(1.5rem, 4vw, 3rem);
-  font-size: clamp(1.1rem, 3vw, 1.3rem);
+  padding: clamp(0.7rem, 1.5vw, 1rem) clamp(1.2rem, 3vw, 2.5rem);
+  font-size: clamp(0.95rem, 2.5vw, 1.2rem);
   flex: 1;
-  min-width: 120px;
+  min-width: 100px;
 }
 
 .feedback-message {
