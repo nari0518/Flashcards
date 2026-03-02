@@ -68,7 +68,12 @@ const App = () => {
         const loadInitialData = async () => {
             // Load History (Legacy key support)
             const savedHistory = localStorage.getItem('flashcardHistory') || localStorage.getItem('kanjiHistory');
-            if (savedHistory) setHistory(JSON.parse(savedHistory));
+            if (savedHistory) {
+                const parsed = JSON.parse(savedHistory);
+                // ensure every record has a type field
+                const normalized = parsed.map(h => h.type ? h : { ...h, type: 'Kanji' });
+                setHistory(normalized);
+            }
 
             // Load Sets from LocalStorage
             const savedSets = localStorage.getItem('kanjiSets');
@@ -242,8 +247,9 @@ const App = () => {
                 const imported = JSON.parse(event.target.result);
                 if (Array.isArray(imported)) {
                     if (window.confirm(`${imported.length}件の履歴をインポートしますか？現在の履歴は上書きされます。`)) {
-                        setHistory(imported);
-                        localStorage.setItem('flashcardHistory', JSON.stringify(imported));
+                        const normalized = imported.map(h => h.type ? h : { ...h, type: 'Kanji' });
+                        setHistory(normalized);
+                        localStorage.setItem('flashcardHistory', JSON.stringify(normalized));
                     }
                 } else {
                     alert('無効な履歴形式です。');
@@ -382,8 +388,9 @@ const App = () => {
                 total: quizData.length,
                 correct: stats.correct,
                 incorrect: stats.incorrect,
-                mistakes: [...stats.mistakes]
-            };
+                mistakes: [...stats.mistakes],
+                type: appMode // 'Kanji' or 'English'
+            }; // record which mode this session belonged to
             const updatedHistory = [sessionResult, ...history];
             setHistory(updatedHistory);
             localStorage.setItem('flashcardHistory', JSON.stringify(updatedHistory));
@@ -683,7 +690,7 @@ const App = () => {
     const renderHistory = () => (
         <div className="fade-in container-narrow">
             <header className="view-header">
-                <h2>学習履歴</h2>
+                <h2>学習履歴 ({appMode === 'Kanji' ? '漢字' : '英語'})</h2>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                     <button className="btn btn-outline btn-small" onClick={exportHistory}>書出</button>
                     <button className="btn btn-outline btn-small" onClick={() => historyImportRef.current.click()}>読込</button>
@@ -692,9 +699,9 @@ const App = () => {
                 </div>
             </header>
             <div className="history-list">
-                {history.length === 0 ? (
+                {history.filter(r => r.type === appMode).length === 0 ? (
                     <div className="glass text-center" style={{ padding: '3rem' }}>履歴がありません</div>
-                ) : history.map((record) => (
+                ) : history.filter(r => r.type === appMode).map((record) => (
                     <div key={record.id} className="glass history-card">
                         <div className="history-top">
                             <span className="history-date">{record.date}</span>
