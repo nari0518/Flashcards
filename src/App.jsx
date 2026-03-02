@@ -532,12 +532,17 @@ const App = () => {
                         {sentenceText}
 
                         {!isSelfMode ? (
-                            <form onSubmit={checkAnswer} className="input-group-quiz">
-                                <input ref={inputRef} type="text" className="input-field-large" placeholder="読みを入力" value={userInput} onChange={e => setUserInput(e.target.value)} disabled={feedback.type !== ''} autoFocus />
-                                <button type="submit" className="btn btn-primary" disabled={feedback.type !== ''}>判定</button>
-                            </form>
+                            <>
+                                <form onSubmit={checkAnswer} className="input-group-quiz">
+                                    <input ref={inputRef} type="text" className="input-field-large" placeholder="読みを入力" value={userInput} onChange={e => setUserInput(e.target.value)} disabled={feedback.type !== ''} autoFocus />
+                                    <button type="submit" className="btn btn-primary" disabled={feedback.type !== ''}>判定</button>
+                                </form>
+                                <div className={`feedback-message ${feedback.type}`}>{feedback.message}</div>
+                            </>
                         ) : !showAnswer ? (
-                            <button className="btn btn-primary btn-answer" onClick={() => setShowAnswer(true)}>答えを見る</button>
+                            <>
+                                <button className="btn btn-primary btn-answer" onClick={() => setShowAnswer(true)}>答えを見る</button>
+                            </>
                         ) : (
                             <div className="answer-reveal fade-in">
                                 <div className="revealed-text">{answerText}</div>
@@ -547,7 +552,6 @@ const App = () => {
                                 </div>
                             </div>
                         )}
-                        <div className={`feedback-message ${feedback.type}`}>{feedback.message}</div>
                     </div>
                 </div>
                 <button className="btn btn-outline" onClick={() => setView('setup')}>中断して戻る</button>

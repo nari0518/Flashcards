@@ -195,11 +195,13 @@ body {
 }
 
 .quiz-word-display {
-  font-size: 4rem;
+  font-size: clamp(2.5rem, 8vw, 4rem);
   font-weight: 900;
   color: #fff;
-  margin-bottom: 4rem;
   letter-spacing: -0.02em;
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 /* Setup View */
@@ -269,8 +271,16 @@ body {
 }
 
 /* Quiz View */
+.quiz-body {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
+  width: 100%;
+}
+
 .quiz-header {
-  margin-bottom: 2.5rem;
+  margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
 }
 
 .quiz-meta {
@@ -301,25 +311,33 @@ body {
 
 .flashcard {
   background: linear-gradient(145deg, #1f2937, #111827);
-  padding: 3rem 2rem;
+  padding: clamp(1.5rem, 5vw, 3rem) clamp(1rem, 4vw, 2rem);
   border-radius: 2.5rem;
   border: 2px solid var(--glass-border);
   text-align: center;
   margin-bottom: 2.5rem;
-  height: clamp(350px, 60vh, 550px);
+  min-height: clamp(300px, 50vh, 500px);
+  max-height: 80vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  gap: clamp(1rem, 3vw, 2rem);
   position: relative;
   box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.6);
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 1000px;
 }
 
 .sentence-text {
-  font-size: 2.2rem;
+  font-size: clamp(1.4rem, 5vw, 2.2rem);
   font-weight: 700;
-  line-height: 1.7;
-  margin-bottom: 3.5rem;
+  line-height: 1.8;
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
 }
 
 .target-word {
@@ -327,14 +345,18 @@ body {
   font-weight: 900;
   border-bottom: 4px solid;
   padding-bottom: 6px;
+  display: inline-block;
+  margin: 0 2px;
 }
 
 .input-group-quiz {
   display: flex;
-  gap: 1rem;
-  max-width: 500px;
+  gap: clamp(0.5rem, 2vw, 1rem);
+  max-width: 90vw;
   margin: 0 auto;
   width: 100%;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .input-field-large {
@@ -342,12 +364,14 @@ body {
   background: #000;
   border: 3px solid var(--glass-border);
   border-radius: 1.2rem;
-  padding: 1.5rem;
+  padding: clamp(0.75rem, 2vw, 1.5rem);
   color: #fff;
-  font-size: 1.8rem;
+  font-size: clamp(1.2rem, 4vw, 1.8rem);
   font-weight: 800;
   text-align: center;
   min-width: 0;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .input-field-large:focus {
@@ -357,45 +381,58 @@ body {
 }
 
 .btn-answer {
-  padding: 1.5rem 4rem;
-  font-size: 1.4rem;
+  padding: clamp(1rem, 2.5vw, 1.5rem) clamp(2rem, 5vw, 4rem);
+  font-size: clamp(1.1rem, 3vw, 1.4rem);
   font-weight: 800;
   margin: 0 auto;
   box-shadow: 0 10px 25px rgba(168, 81, 247, 0.4);
 }
 
 .revealed-text {
-  font-size: 6rem;
+  font-size: clamp(3rem, 10vw, 6rem);
   font-weight: 900;
   color: var(--accent);
-  margin-bottom: 3rem;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+.answer-reveal {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1rem, 2vw, 2rem);
+  width: 100%;
+  align-items: center;
 }
 
 .self-assessment-actions {
   display: flex;
-  gap: 2rem;
+  gap: clamp(1rem, 3vw, 2rem);
   justify-content: center;
+  flex-wrap: wrap;
 }
 
 .btn-correct {
   background: var(--success);
-  padding: 1.2rem 3rem;
-  font-size: 1.3rem;
+  padding: clamp(0.8rem, 2vw, 1.2rem) clamp(1.5rem, 4vw, 3rem);
+  font-size: clamp(1.1rem, 3vw, 1.3rem);
+  flex: 1;
+  min-width: 120px;
 }
 
 .btn-incorrect {
   background: var(--danger);
-  padding: 1.2rem 3rem;
-  font-size: 1.3rem;
+  padding: clamp(0.8rem, 2vw, 1.2rem) clamp(1.5rem, 4vw, 3rem);
+  font-size: clamp(1.1rem, 3vw, 1.3rem);
+  flex: 1;
+  min-width: 120px;
 }
 
 .feedback-message {
-  position: absolute;
-  bottom: 3rem;
-  left: 0;
-  width: 100%;
   font-weight: 900;
-  font-size: 1.5rem;
+  font-size: clamp(1.2rem, 3vw, 1.5rem);
+  margin-top: clamp(0.5rem, 2vw, 1.5rem);
+  min-height: 1.5em;
 }
 
 .feedback-message.correct {
@@ -615,46 +652,114 @@ body {
 }
 
 /* Mobile Optimizations */
+@media (max-width: 1024px) {
+  .flashcard {
+    max-height: 60vh;
+  }
+}
+
 @media (max-width: 768px) {
   .main-header h1 {
     font-size: 2.2rem;
   }
 
   .flashcard {
-    min-height: 350px;
-    padding: 3rem 1.5rem;
-  }
-
-  .sentence-text {
-    font-size: 1.5rem;
-  }
-
-  .revealed-text {
-    font-size: 4rem;
-  }
-
-  .input-group-horizontal {
-    flex-direction: column;
+    min-height: auto;
+    max-height: 65vh;
   }
 
   .input-group-quiz {
     flex-direction: column;
+    max-width: 100%;
   }
 
   .input-field-large {
     width: 100%;
     border-radius: 1rem;
-    padding: 1rem;
-    font-size: 1.4rem;
   }
 
   .input-group-quiz .btn {
     width: 100%;
-    padding: 1rem;
+    padding: clamp(0.8rem, 2vw, 1rem);
+    font-size: clamp(1rem, 3vw, 1.1rem);
   }
 
   .score-num {
     font-size: 3.5rem;
+  }
+
+  .self-assessment-actions {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .btn-correct,
+  .btn-incorrect {
+    width: 100%;
+    flex: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-wrapper {
+    padding: 1.5rem 1rem;
+  }
+
+  .main-header h1 {
+    font-size: 1.8rem;
+  }
+
+  .main-header p {
+    font-size: 1rem;
+  }
+
+  .flashcard {
+    border-radius: 1.5rem;
+    min-height: auto;
+    max-height: 70vh;
+  }
+
+  .quiz-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .quiz-meta {
+    font-size: 0.9rem;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .sentence-text {
+    word-spacing: -0.05em;
+  }
+
+  .target-word {
+    border-bottom: 3px solid;
+    padding-bottom: 4px;
+  }
+
+  .input-field-large {
+    padding: clamp(0.6rem, 1.5vw, 1rem);
+    font-size: clamp(1rem, 3.5vw, 1.4rem);
+  }
+
+  .btn {
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .btn-answer {
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+  }
+
+  .feedback-message {
+    font-size: 1.2rem;
+    bottom: 1rem;
+  }
+
+  .revealed-text {
+    font-size: clamp(2.5rem, 8vw, 4rem);
   }
 }
 
