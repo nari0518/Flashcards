@@ -18,6 +18,7 @@ const App = () => {
     const [isAnimating, setIsAnimating] = useState(false);
     const [showAnswer, setShowAnswer] = useState(false);
     const [history, setHistory] = useState([]);
+    const [savedSession, setSavedSession] = useState(null);
 
     // Quiz Execution Data
     const [quizData, setQuizData] = useState([]);
@@ -31,6 +32,8 @@ const App = () => {
     const fileInputRef = useRef(null);
     const historyImportRef = useRef(null);
     const inputRef = useRef(null);
+    const quizTimeoutsRef = useRef([]);
+    const savedQuizSessionKey = 'flashcardSavedQuizSession';
 
     // Default initial set structure
     const createNewSet = (name, type = 'Kanji', items = []) => ({
@@ -63,6 +66,30 @@ const App = () => {
         }
     };
 
+    const clearQuizTimeouts = () => {
+        quizTimeoutsRef.current.forEach(timeoutId => clearTimeout(timeoutId));
+        quizTimeoutsRef.current = [];
+    };
+
+    const scheduleQuizTimeout = (callback, delay) => {
+        const timeoutId = setTimeout(() => {
+            quizTimeoutsRef.current = quizTimeoutsRef.current.filter(id => id !== timeoutId);
+            callback();
+        }, delay);
+        quizTimeoutsRef.current.push(timeoutId);
+        return timeoutId;
+    };
+
+    const saveQuizSession = (session) => {
+        localStorage.setItem(savedQuizSessionKey, JSON.stringify(session));
+        setSavedSession(session);
+    };
+
+    const clearSavedQuizSession = () => {
+        localStorage.removeItem(savedQuizSessionKey);
+        setSavedSession(null);
+    };
+
     // Initial Load & public/sets Integration
     useEffect(() => {
         const loadInitialData = async () => {
@@ -73,6 +100,21 @@ const App = () => {
                 // ensure every record has a type field
                 const normalized = parsed.map(h => h.type ? h : { ...h, type: 'Kanji' });
                 setHistory(normalized);
+            }
+
+            // Load paused quiz session
+            const savedQuizSession = localStorage.getItem(savedQuizSessionKey);
+            if (savedQuizSession) {
+                try {
+                    const parsedSession = JSON.parse(savedQuizSession);
+                    if (parsedSession && Array.isArray(parsedSession.quizData)) {
+                        setSavedSession(parsedSession);
+                    } else {
+                        localStorage.removeItem(savedQuizSessionKey);
+                    }
+                } catch (e) {
+                    localStorage.removeItem(savedQuizSessionKey);
+                }
             }
 
             // Load Sets from LocalStorage
@@ -300,6 +342,8 @@ const App = () => {
             alert('このセットには問題が登録されていません。');
             return;
         }
+        clearSavedQuizSession();
+        clearQuizTimeouts();
         const finalData = isShuffle ? shuffleArray(data) : [...data];
         setQuizData(finalData);
         setStats({ correct: 0, incorrect: 0, mistakes: [] });
@@ -308,6 +352,49 @@ const App = () => {
         setFeedback({ type: '', message: '' });
         setUserInput('');
         setShowAnswer(false);
+    };
+
+    const saveAndExitQuiz = () => {
+        if (view !== 'quiz') return;
+
+        saveQuizSession({
+            appMode,
+            activeSetId,
+            quizMode,
+            readingModeType,
+            isShuffle,
+            quizData,
+            currentIndex,
+            userInput,
+            feedback,
+            stats,
+            showAnswer,
+            savedAt: new Date().toISOString(),
+        });
+
+        clearQuizTimeouts();
+        setIsAnimating(false);
+        setView('setup');
+    };
+
+    const resumeSavedQuiz = () => {
+        if (!savedSession || !Array.isArray(savedSession.quizData) || savedSession.quizData.length === 0) return;
+
+        clearQuizTimeouts();
+        setAppMode(savedSession.appMode || 'Kanji');
+        setActiveSetId(savedSession.activeSetId || '');
+        setQuizMode(savedSession.quizMode || 'writing');
+        setReadingModeType(savedSession.readingModeType || 'input');
+        setIsShuffle(!!savedSession.isShuffle);
+        setQuizData(savedSession.quizData);
+        setCurrentIndex(savedSession.currentIndex || 0);
+        setUserInput(savedSession.userInput || '');
+        setFeedback(savedSession.feedback || { type: '', message: '' });
+        setStats(savedSession.stats || { correct: 0, incorrect: 0, mistakes: [] });
+        setIsAnimating(false);
+        setShowAnswer(!!savedSession.showAnswer);
+        setView('quiz');
+        clearSavedQuizSession();
     };
 
     const checkAnswer = (e) => {
@@ -324,7 +411,7 @@ const App = () => {
         if (input === currentItem.reading) {
             setFeedback({ type: 'correct', message: '正解！' });
             setStats(prev => ({ ...prev, correct: prev.correct + 1 }));
-            setTimeout(nextQuestion, 800);
+            scheduleQuizTimeout(nextQuestion, 800);
         } else {
             setFeedback({ type: 'incorrect', message: `残念！ 正解は「${currentItem.reading}」です。` });
             setStats(prev => ({
@@ -334,11 +421,11 @@ const App = () => {
             }));
             setUserInput('');
             setIsAnimating(true);
-            setTimeout(() => {
+            scheduleQuizTimeout(() => {
                 setIsAnimating(false);
                 inputRef.current?.focus();
             }, 500);
-            setTimeout(nextQuestion, 2000);
+            scheduleQuizTimeout(nextQuestion, 2000);
         }
     };
 
@@ -355,7 +442,7 @@ const App = () => {
             }));
             setFeedback({ type: 'incorrect', message: '× 残念！' });
         }
-        setTimeout(nextQuestion, 800);
+        scheduleQuizTimeout(nextQuestion, 800);
     };
 
     const nextQuestion = () => {
@@ -373,6 +460,7 @@ const App = () => {
     // Save History
     useEffect(() => {
         if (view === 'result') {
+            clearSavedQuizSession();
             let modeStr = "";
             if (appMode === 'Kanji') {
                 modeStr = quizMode === 'writing' ? '書き' : `読み (${readingModeType === 'input' ? '入力' : '判定'})`;
@@ -397,6 +485,8 @@ const App = () => {
         }
     }, [view]);
 
+    useEffect(() => () => clearQuizTimeouts(), []);
+
     // View Components
     const renderModal = () => modal.show && (
         <div className="fade-in modal-overlay">
@@ -413,6 +503,7 @@ const App = () => {
 
     const renderSetup = () => {
         const filteredSets = sets.filter(s => s.type === appMode);
+        const hasSavedQuiz = savedSession && Array.isArray(savedSession.quizData) && savedSession.quizData.length > 0;
 
         return (
             <div className="fade-in container-narrow">
@@ -480,6 +571,19 @@ const App = () => {
 
                     <button className="btn btn-primary btn-large" onClick={startQuiz}>開始 ➜</button>
                 </div>
+
+                {hasSavedQuiz && (
+                    <div className="glass card" style={{ marginTop: '1.5rem' }}>
+                        <h2 style={{ fontSize: '1.1rem', marginBottom: '0.75rem' }}>保存済みの学習があります</h2>
+                        <p style={{ color: 'var(--text-muted)', marginBottom: '1rem' }}>
+                            {savedSession.savedAt ? new Date(savedSession.savedAt).toLocaleString() : '未保存時刻'} に保存されました。
+                        </p>
+                        <div style={{ display: 'flex', gap: '0.75rem' }}>
+                            <button className="btn btn-primary" style={{ flex: 1 }} onClick={resumeSavedQuiz}>再開する</button>
+                            <button className="btn btn-outline" style={{ flex: 1 }} onClick={clearSavedQuizSession}>破棄する</button>
+                        </div>
+                    </div>
+                )}
 
                 <div className="glass card" style={{ marginTop: '1.5rem', padding: '1rem' }}>
                     <div style={{ display: 'flex', gap: '1rem' }}>
@@ -561,7 +665,7 @@ const App = () => {
                         )}
                     </div>
                 </div>
-                <button className="btn btn-outline" onClick={() => setView('setup')}>中断して戻る</button>
+                <button className="btn btn-outline" onClick={saveAndExitQuiz}>保存して終了</button>
             </div>
         );
     };
