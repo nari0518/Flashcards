@@ -13,6 +13,12 @@
       "type": "Kanji"
     },
     {
+      "id": "static-set-english-Q0XjgrDjg6",
+      "name": "CEグリーン",
+      "filename": "English/CEグリーン.csv",
+      "type": "English"
+    },
+    {
       "id": "static-set-english-Ujfoi7Hjgr",
       "name": "R7英コミb",
       "filename": "English/R7英コミb.csv",

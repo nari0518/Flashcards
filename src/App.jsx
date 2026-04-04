@@ -33,7 +33,36 @@ const App = () => {
     const historyImportRef = useRef(null);
     const inputRef = useRef(null);
     const quizTimeoutsRef = useRef([]);
-    const savedQuizSessionKey = 'flashcardSavedQuizSession';
+    const savedSessionPrefix = 'flashcardSavedQuizSession';
+
+    const makeSessionKey = (am, setId, qMode, reading) => `${savedSessionPrefix}:${am}:${setId}:${qMode}:${reading}`;
+
+    const loadSavedSessionFor = (am = appMode, setId = activeSetId, qMode = quizMode, reading = readingModeType) => {
+        if (!am || !setId) return null;
+        const key = makeSessionKey(am, setId, qMode, reading);
+        const raw = localStorage.getItem(key);
+        if (!raw) return null;
+        try {
+            const parsed = JSON.parse(raw);
+            return { ...parsed, __key: key };
+        } catch (e) {
+            localStorage.removeItem(key);
+            return null;
+        }
+    };
+
+    const saveQuizSession = (session) => {
+        const key = makeSessionKey(session.appMode || appMode, session.activeSetId || activeSetId, session.quizMode || quizMode, session.readingModeType || readingModeType);
+        localStorage.setItem(key, JSON.stringify(session));
+        setSavedSession({ ...session, __key: key });
+    };
+
+    const clearSavedQuizSession = (am = appMode, setId = activeSetId, qMode = quizMode, reading = readingModeType) => {
+        if (!am || !setId) return;
+        const key = makeSessionKey(am, setId, qMode, reading);
+        localStorage.removeItem(key);
+        if (savedSession && savedSession.__key === key) setSavedSession(null);
+    };
 
     // Default initial set structure
     const createNewSet = (name, type = 'Kanji', items = []) => ({
@@ -42,7 +71,6 @@ const App = () => {
         type: type,
         items: items
     });
-
     const defaultSets = {
         Kanji: {
             id: 'default-kanji',
@@ -80,15 +108,7 @@ const App = () => {
         return timeoutId;
     };
 
-    const saveQuizSession = (session) => {
-        localStorage.setItem(savedQuizSessionKey, JSON.stringify(session));
-        setSavedSession(session);
-    };
-
-    const clearSavedQuizSession = () => {
-        localStorage.removeItem(savedQuizSessionKey);
-        setSavedSession(null);
-    };
+    
 
     // Initial Load & public/sets Integration
     useEffect(() => {
@@ -102,20 +122,8 @@ const App = () => {
                 setHistory(normalized);
             }
 
-            // Load paused quiz session
-            const savedQuizSession = localStorage.getItem(savedQuizSessionKey);
-            if (savedQuizSession) {
-                try {
-                    const parsedSession = JSON.parse(savedQuizSession);
-                    if (parsedSession && Array.isArray(parsedSession.quizData)) {
-                        setSavedSession(parsedSession);
-                    } else {
-                        localStorage.removeItem(savedQuizSessionKey);
-                    }
-                } catch (e) {
-                    localStorage.removeItem(savedQuizSessionKey);
-                }
-            }
+            // (旧来の単一セッション読み取りは廃止) — セット/モード別の保存セッションは
+            // セット読み込み後に該当キーでロードします。
 
             // Load Sets from LocalStorage
             const savedSets = localStorage.getItem('kanjiSets');
@@ -165,6 +173,10 @@ const App = () => {
             const firstSet = initialSets.find(s => s.type === appMode) || initialSets[0];
             setActiveSetId(firstSet.id);
             if (firstSet.type !== appMode) setAppMode(firstSet.type);
+
+            // 初期表示のセット/モードに対する保存済みセッションをロードして状態に反映
+            const initialSaved = loadSavedSessionFor(firstSet.type || appMode, firstSet.id, quizMode, readingModeType);
+            if (initialSaved) setSavedSession(initialSaved);
         };
 
         loadInitialData();
@@ -354,6 +366,17 @@ const App = () => {
         setShowAnswer(false);
     };
 
+    // Handle start button click: if there's a saved session for the selected set/mode, ask resume/new
+    const handleStartClick = () => {
+        const sess = loadSavedSessionFor();
+        if (sess && Array.isArray(sess.quizData) && sess.quizData.length > 0) {
+            setSavedSession(sess);
+            setModal({ show: true, type: 'resume-choice', value: '', targetId: '' });
+        } else {
+            startQuiz();
+        }
+    };
+
     const saveAndExitQuiz = () => {
         if (view !== 'quiz') return;
 
@@ -377,24 +400,32 @@ const App = () => {
         setView('setup');
     };
 
-    const resumeSavedQuiz = () => {
-        if (!savedSession || !Array.isArray(savedSession.quizData) || savedSession.quizData.length === 0) return;
+    const resumeSavedQuiz = (sessionParam) => {
+        const sessionToUse = sessionParam || savedSession || loadSavedSessionFor();
+        if (!sessionToUse || !Array.isArray(sessionToUse.quizData) || sessionToUse.quizData.length === 0) return;
 
         clearQuizTimeouts();
-        setAppMode(savedSession.appMode || 'Kanji');
-        setActiveSetId(savedSession.activeSetId || '');
-        setQuizMode(savedSession.quizMode || 'writing');
-        setReadingModeType(savedSession.readingModeType || 'input');
-        setIsShuffle(!!savedSession.isShuffle);
-        setQuizData(savedSession.quizData);
-        setCurrentIndex(savedSession.currentIndex || 0);
-        setUserInput(savedSession.userInput || '');
-        setFeedback(savedSession.feedback || { type: '', message: '' });
-        setStats(savedSession.stats || { correct: 0, incorrect: 0, mistakes: [] });
+        setAppMode(sessionToUse.appMode || 'Kanji');
+        setActiveSetId(sessionToUse.activeSetId || '');
+        setQuizMode(sessionToUse.quizMode || 'writing');
+        setReadingModeType(sessionToUse.readingModeType || 'input');
+        setIsShuffle(!!sessionToUse.isShuffle);
+        setQuizData(sessionToUse.quizData);
+        setCurrentIndex(sessionToUse.currentIndex || 0);
+        setUserInput(sessionToUse.userInput || '');
+        setFeedback(sessionToUse.feedback || { type: '', message: '' });
+        setStats(sessionToUse.stats || { correct: 0, incorrect: 0, mistakes: [] });
         setIsAnimating(false);
-        setShowAnswer(!!savedSession.showAnswer);
+        setShowAnswer(!!sessionToUse.showAnswer);
         setView('quiz');
-        clearSavedQuizSession();
+
+        // clear only the saved session for this set/mode
+        if (sessionToUse.__key) {
+            localStorage.removeItem(sessionToUse.__key);
+        } else {
+            clearSavedQuizSession(sessionToUse.appMode, sessionToUse.activeSetId, sessionToUse.quizMode, sessionToUse.readingModeType);
+        }
+        setSavedSession(null);
     };
 
     const checkAnswer = (e) => {
@@ -445,6 +476,8 @@ const App = () => {
         scheduleQuizTimeout(nextQuestion, 800);
     };
 
+    
+
     const nextQuestion = () => {
         if (currentIndex < quizData.length - 1) {
             setCurrentIndex(prev => prev + 1);
@@ -471,8 +504,11 @@ const App = () => {
             const sessionResult = {
                 id: Date.now(),
                 date: new Date().toLocaleString(),
+                setId: activeSet.id,
                 setName: activeSet.name,
                 mode: modeStr,
+                quizMode: quizMode,
+                readingModeType: readingModeType,
                 total: quizData.length,
                 correct: stats.correct,
                 incorrect: stats.incorrect,
@@ -490,14 +526,30 @@ const App = () => {
     // View Components
     const renderModal = () => modal.show && (
         <div className="fade-in modal-overlay">
-            <form onSubmit={handleModalSubmit} className="glass modal-content">
-                <h2>{modal.type === 'create' ? '新しいセットを作成' : '名前を変更'}</h2>
-                <input autoFocus type="text" className="input-field" value={modal.value} onChange={e => setModal({ ...modal, value: e.target.value })} placeholder="セットの名前を入力" style={{ width: '100%', margin: '1.5rem 0' }} />
-                <div style={{ display: 'flex', gap: '1rem' }}>
-                    <button type="button" className="btn btn-outline" style={{ flex: 1 }} onClick={closeModal}>キャンセル</button>
-                    <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>保存</button>
+            {(modal.type === 'create' || modal.type === 'rename') ? (
+                <form onSubmit={handleModalSubmit} className="glass modal-content">
+                    <h2>{modal.type === 'create' ? '新しいセットを作成' : '名前を変更'}</h2>
+                    <input autoFocus type="text" className="input-field" value={modal.value} onChange={e => setModal({ ...modal, value: e.target.value })} placeholder="セットの名前を入力" style={{ width: '100%', margin: '1.5rem 0' }} />
+                    <div style={{ display: 'flex', gap: '1rem' }}>
+                        <button type="button" className="btn btn-outline" style={{ flex: 1 }} onClick={closeModal}>キャンセル</button>
+                        <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>保存</button>
+                    </div>
+                </form>
+            ) : modal.type === 'resume-choice' ? (
+                <div className="glass modal-content">
+                    <h2>保存済みの学習があります</h2>
+                    <p style={{ color: 'var(--text-muted)', margin: '1rem 0' }}>
+                        {savedSession && savedSession.savedAt ? new Date(savedSession.savedAt).toLocaleString() : '保存されたセッションがあります。'}
+                    </p>
+                    <div style={{ display: 'flex', gap: '0.75rem' }}>
+                        <button className="btn btn-primary" style={{ flex: 1 }} onClick={() => { resumeSavedQuiz(); closeModal(); }}>続きから再開</button>
+                        <button className="btn btn-outline" style={{ flex: 1 }} onClick={() => { startQuiz(); closeModal(); }}>新しく始める</button>
+                    </div>
+                    <div style={{ marginTop: '0.75rem' }}>
+                        <button className="btn btn-text" onClick={closeModal}>キャンセル</button>
+                    </div>
                 </div>
-            </form>
+            ) : null}
         </div>
     );
 
@@ -569,21 +621,8 @@ const App = () => {
                         </div>
                     </div>
 
-                    <button className="btn btn-primary btn-large" onClick={startQuiz}>開始 ➜</button>
+                    <button className="btn btn-primary btn-large" onClick={handleStartClick}>開始 ➜</button>
                 </div>
-
-                {hasSavedQuiz && (
-                    <div className="glass card" style={{ marginTop: '1.5rem' }}>
-                        <h2 style={{ fontSize: '1.1rem', marginBottom: '0.75rem' }}>保存済みの学習があります</h2>
-                        <p style={{ color: 'var(--text-muted)', marginBottom: '1rem' }}>
-                            {savedSession.savedAt ? new Date(savedSession.savedAt).toLocaleString() : '未保存時刻'} に保存されました。
-                        </p>
-                        <div style={{ display: 'flex', gap: '0.75rem' }}>
-                            <button className="btn btn-primary" style={{ flex: 1 }} onClick={resumeSavedQuiz}>再開する</button>
-                            <button className="btn btn-outline" style={{ flex: 1 }} onClick={clearSavedQuizSession}>破棄する</button>
-                        </div>
-                    </div>
-                )}
 
                 <div className="glass card" style={{ marginTop: '1.5rem', padding: '1rem' }}>
                     <div style={{ display: 'flex', gap: '1rem' }}>
@@ -640,32 +679,41 @@ const App = () => {
 
                 <div className="quiz-body">
                     <div className={`flashcard ${isAnimating ? 'shake' : ''}`}>
-                        {sentenceText}
-
-                        {!isSelfMode ? (
-                            <>
-                                <form onSubmit={checkAnswer} className="input-group-quiz">
-                                    <input ref={inputRef} type="text" className="input-field-large" placeholder="読みを入力" value={userInput} onChange={e => setUserInput(e.target.value)} disabled={feedback.type !== ''} autoFocus />
-                                    <button type="submit" className="btn btn-primary" disabled={feedback.type !== ''}>判定</button>
-                                </form>
-                                <div className={`feedback-message ${feedback.type}`}>{feedback.message}</div>
-                            </>
-                        ) : !showAnswer ? (
-                            <>
-                                <button className="btn btn-primary btn-answer" onClick={() => setShowAnswer(true)}>答えを見る</button>
-                            </>
-                        ) : (
-                            <div className="answer-reveal fade-in">
-                                <div className="revealed-text">{answerText}</div>
-                                <div className="self-assessment-actions">
-                                    <button className="btn btn-incorrect" onClick={() => handleSelfAssessment(false)}>× 不正解</button>
-                                    <button className="btn btn-correct" onClick={() => handleSelfAssessment(true)}>〇 正解！</button>
+                        <div className="card-question">
+                            {sentenceText}
+                        </div>
+                        <div className="card-answer">
+                            {!isSelfMode ? (
+                                <>
+                                    <form onSubmit={checkAnswer} className="input-group-quiz">
+                                        <input ref={inputRef} type="text" className="input-field-large" placeholder={appMode === 'Kanji' ? '読みを入力' : '回答を入力'} value={userInput} onChange={e => setUserInput(e.target.value)} disabled={feedback.type !== ''} autoFocus />
+                                        <button type="submit" className="btn btn-primary" disabled={feedback.type !== ''}>判定</button>
+                                    </form>
+                                    <div className={`feedback-message ${feedback.type}`}>{feedback.message}</div>
+                                </>
+                            ) : !showAnswer ? (
+                                <></>
+                            ) : (
+                                <div className="answer-reveal fade-in">
+                                    <div className="revealed-text">{answerText}</div>
                                 </div>
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
                 </div>
-                <button className="btn btn-outline" onClick={saveAndExitQuiz}>保存して終了</button>
+                <div className="quiz-footer-actions">
+                    <div className="external-assessment">
+                        {isSelfMode && !showAnswer ? (
+                            <button className="btn btn-primary btn-answer-inline" onClick={() => setShowAnswer(true)}>答えを見る</button>
+                        ) : showAnswer ? (
+                            <>
+                                <button className="btn btn-incorrect" onClick={() => handleSelfAssessment(false)}>× 不正解</button>
+                                <button className="btn btn-correct" onClick={() => handleSelfAssessment(true)}>〇 正解</button>
+                            </>
+                        ) : null}
+                    </div>
+                    <button className="btn btn-outline save-exit-btn" onClick={saveAndExitQuiz}>保存して終了</button>
+                </div>
             </div>
         );
     };

@@ -35,7 +35,7 @@ body {
 
 .app-wrapper {
   width: 100%;
-  padding: 3rem 1.5rem;
+  padding: 1.5rem 1rem;
   max-width: 1200px;
 }
 
@@ -206,8 +206,8 @@ body {
 
 /* Setup View */
 .card {
-  padding: 2.5rem;
-  margin-bottom: 1.5rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
 }
 
 .form-group {
@@ -275,7 +275,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: stretch;
-  margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
+  margin-bottom: 0.75rem;
   width: 100%;
 }
 
@@ -311,25 +311,23 @@ body {
 
 .flashcard {
   background: linear-gradient(145deg, #1f2937, #111827);
-  /* 固定幅を指定して内容に左右されないように */
   width: clamp(300px, 40vw, 600px);
-  /* 高さも一定範囲内におさめる */
-  height: clamp(300px, 40vh, 500px);
-  padding: clamp(1rem, 2vw, 1.5rem) clamp(0.8rem, 2vw, 1.5rem);
-  border-radius: 2.5rem;
+  height: clamp(280px, 36vh, 460px);
+  padding: clamp(0.6rem, 1.5vw, 1rem) clamp(0.6rem, 1.5vw, 1rem);
+  border-radius: 1.8rem;
   border: 2px solid var(--glass-border);
   text-align: center;
-  margin-bottom: 2.5rem;
+  margin-bottom: 0.5rem;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  gap: clamp(0.8rem, 1.5vw, 1.2rem);
+  gap: clamp(0.4rem, 0.8vw, 0.6rem);
   position: relative;
-  box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 20px 40px -8px rgba(0, 0, 0, 0.55);
   overflow-y: auto;
   overflow-x: hidden;
-  padding-top: clamp(1.5rem, 3vw, 2.5rem);
+  padding-top: clamp(0.8rem, 2vw, 1.25rem);
 }
 
 /* プログレスバーは常にビュー幅に対して100% */
@@ -350,8 +348,8 @@ body {
 .target-word {
   color: var(--accent);
   font-weight: 900;
-  border-bottom: 4px solid;
-  padding-bottom: 6px;
+  border-bottom: 3px solid;
+  padding-bottom: 4px;
   display: inline-block;
   margin: 0 2px;
 }
@@ -407,14 +405,23 @@ body {
 .answer-reveal {
   display: flex;
   flex-direction: column;
-  gap: clamp(1rem, 2vw, 2rem);
+  gap: clamp(0.6rem, 1.5vw, 1rem);
   width: 100%;
   align-items: center;
 }
 
+.quiz-footer-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  width: 100%;
+  margin-top: 0.1rem;
+}
+
 .self-assessment-actions {
   display: flex;
-  gap: clamp(1rem, 3vw, 2rem);
+  gap: clamp(0.5rem, 1.5vw, 0.8rem);
   justify-content: center;
   flex-wrap: wrap;
 }
@@ -631,14 +638,79 @@ body {
 
 /* Modal */
 .modal-content {
-  padding: 3rem;
-  max-width: 500px;
+  padding: 1.5rem;
+  max-width: 520px;
   border: 2px solid var(--primary);
 }
 
 .modal-content h2 {
   font-size: 1.8rem;
   font-weight: 900;
+}
+
+/* Modal overlay: full-screen centered modal to avoid being missed */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.55);
+  z-index: 9999;
+  padding: 1.25rem;
+}
+
+/* Card split areas */
+.card-question {
+  width: 100%;
+  padding: 0.4rem 0;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-answer {
+  width: 100%;
+  padding: 0.3rem 0 0.6rem 0;
+  border-top: 1px dashed rgba(255,255,255,0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+/* External assessment buttons below card */
+.external-assessment {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: center;
+  align-items: center;
+  margin-top: 0;
+  flex-wrap: nowrap;
+}
+
+.external-assessment .btn-incorrect,
+.external-assessment .btn-correct,
+.external-assessment .btn-answer-inline {
+  padding: 0.75rem 1.4rem;
+  font-size: 0.98rem;
+  border-radius: 1rem;
+  white-space: nowrap;
+  flex: 0 1 auto;
+}
+
+.btn-answer-inline {
+  background: var(--primary);
+  color: #fff;
+  padding: 0.75rem 1.4rem;
+  font-weight: 800;
+  border-radius: 1rem;
+  font-size: 0.98rem;
+}
+
+.save-exit-btn {
+  margin-top: 0;
 }
 
 /* Animations */
