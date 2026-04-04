@@ -1,31 +1,109 @@
 {
   "sets": [
     {
-      "id": "static-set-kanji-Ujfnj77lm7",
+      "id": "static-set-kanji-S2FuamkvUjfnj77lm73lrablubTmnKsuY3N2",
       "name": "R7現国学年末",
       "filename": "Kanji/R7現国学年末.csv",
       "type": "Kanji"
     },
     {
-      "id": "static-set-kanji-c2FtcGxl",
+      "id": "static-set-kanji-S2Fuamkvc2FtcGxlLmNzdg",
       "name": "sample",
       "filename": "Kanji/sample.csv",
       "type": "Kanji"
     },
     {
-      "id": "static-set-english-Q0XjgrDjg6",
+      "id": "static-set-english-RW5nbGlzaC9DReOCsOODquODvOODsy5jc3Y",
       "name": "CEグリーン",
       "filename": "English/CEグリーン.csv",
       "type": "English"
     },
     {
-      "id": "static-set-english-Ujfoi7Hjgr",
+      "id": "static-set-english-RW5nbGlzaC9DReOCsOODquODvOODs+KRoC5jc3Y",
+      "name": "CEグリーン①",
+      "filename": "English/CEグリーン①.csv",
+      "type": "English"
+    },
+    {
+      "id": "static-set-english-RW5nbGlzaC9DReOCsOODquODvOODs+KRoS5jc3Y",
+      "name": "CEグリーン②",
+      "filename": "English/CEグリーン②.csv",
+      "type": "English"
+    },
+    {
+      "id": "static-set-english-RW5nbGlzaC9DReOCsOODquODvOODs+KRoi5jc3Y",
+      "name": "CEグリーン③",
+      "filename": "English/CEグリーン③.csv",
+      "type": "English"
+    },
+    {
+      "id": "static-set-english-RW5nbGlzaC9DReOCsOODquODvOODs+KRoy5jc3Y",
+      "name": "CEグリーン④",
+      "filename": "English/CEグリーン④.csv",
+      "type": "English"
+    },
+    {
+      "id": "static-set-english-RW5nbGlzaC9DReOCsOODquODvOODs+KRpC5jc3Y",
+      "name": "CEグリーン⑤",
+      "filename": "English/CEグリーン⑤.csv",
+      "type": "English"
+    },
+    {
+      "id": "static-set-english-RW5nbGlzaC9DReOCsOODquODvOODs+KRpS5jc3Y",
+      "name": "CEグリーン⑥",
+      "filename": "English/CEグリーン⑥.csv",
+      "type": "English"
+    },
+    {
+      "id": "static-set-english-RW5nbGlzaC9DReOCsOODquODvOODs+KRpi5jc3Y",
+      "name": "CEグリーン⑦",
+      "filename": "English/CEグリーン⑦.csv",
+      "type": "English"
+    },
+    {
+      "id": "static-set-english-RW5nbGlzaC9DReOCsOODquODvOODs+KRpy5jc3Y",
+      "name": "CEグリーン⑧",
+      "filename": "English/CEグリーン⑧.csv",
+      "type": "English"
+    },
+    {
+      "id": "static-set-english-RW5nbGlzaC9DReOCsOODquODvOODs+KRqC5jc3Y",
+      "name": "CEグリーン⑨",
+      "filename": "English/CEグリーン⑨.csv",
+      "type": "English"
+    },
+    {
+      "id": "static-set-english-RW5nbGlzaC9DReOCsOODquODvOODs+KRqS5jc3Y",
+      "name": "CEグリーン⑩",
+      "filename": "English/CEグリーン⑩.csv",
+      "type": "English"
+    },
+    {
+      "id": "static-set-english-RW5nbGlzaC9DReOCsOODquODvOODs+KRqi5jc3Y",
+      "name": "CEグリーン⑪",
+      "filename": "English/CEグリーン⑪.csv",
+      "type": "English"
+    },
+    {
+      "id": "static-set-english-RW5nbGlzaC9DReOCsOODquODvOODs+KRqy5jc3Y",
+      "name": "CEグリーン⑫",
+      "filename": "English/CEグリーン⑫.csv",
+      "type": "English"
+    },
+    {
+      "id": "static-set-english-RW5nbGlzaC9DReOCsOODquODvOODs+KRrC5jc3Y",
+      "name": "CEグリーン⑬",
+      "filename": "English/CEグリーン⑬.csv",
+      "type": "English"
+    },
+    {
+      "id": "static-set-english-RW5nbGlzaC9SN+iLseOCs+ODn2IuY3N2",
       "name": "R7英コミb",
       "filename": "English/R7英コミb.csv",
       "type": "English"
     },
     {
-      "id": "static-set-english-c2FtcGxlX2",
+      "id": "static-set-english-RW5nbGlzaC9zYW1wbGVfZW4uY3N2",
       "name": "sample_en",
       "filename": "English/sample_en.csv",
       "type": "English"

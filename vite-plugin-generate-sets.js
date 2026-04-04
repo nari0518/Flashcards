@@ -21,7 +21,9 @@ export default function generateSetsPlugin() {
 
                             const sets = csvFiles.map(file => {
                                 const name = file.replace('.csv', '');
-                                const id = `static-set-${type.toLowerCase()}-${Buffer.from(name).toString('base64').substring(0, 10)}`;
+                                // Use the full filename (including type) to generate a unique id,
+                                // avoid short substring collisions when names share the same prefix (e.g. "CEグリーン" variants).
+                                const id = `static-set-${type.toLowerCase()}-${Buffer.from(`${type}/${file}`).toString('base64').replace(/=+$/,'')}`;
                                 return { id, name, filename: `${type}/${file}`, type: type };
                             });
                             allSets = [...allSets, ...sets];
@@ -51,7 +53,7 @@ export default function generateSetsPlugin() {
 
                         const sets = csvFiles.map(f => {
                             const name = f.replace('.csv', '');
-                            const id = `static-set-${type.toLowerCase()}-${Buffer.from(name).toString('base64').substring(0, 10)}`;
+                            const id = `static-set-${type.toLowerCase()}-${Buffer.from(`${type}/${f}`).toString('base64').replace(/=+$/,'')}`;
                             return { id, name, filename: `${type}/${f}`, type: type };
                         });
                         allSets = [...allSets, ...sets];
